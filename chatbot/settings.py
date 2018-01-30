@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '-@rg_nw2r1x5x$)z0kzz+y1vv0yq$^r0l(!dr6oc0fo!e)aw9t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['chatbot.swimtw.synology.me']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

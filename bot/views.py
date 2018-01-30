@@ -42,10 +42,7 @@ def shuttle(where):
             cur.execute(sql,(str(int(hour)+1),'순환버스'))
             shuttle = cur.fetchall()
             if shuttle != []:
-                for x in shuttle:
-                    if int(x[2]) >= minute:
-                        shuttle_list += [x]
-                        break
+                shuttle_list += [shuttle[0]]
     elif where == 1:
         handaeap = 0
         cur.execute(sql,(str(hour),'한대앞역행'))
@@ -58,10 +55,7 @@ def shuttle(where):
         if shuttle_list == []:
             cur.execute(sql,(str(int(hour)+1),'한대앞역행'))
             shuttle = cur.fetchall()
-            for x in shuttle:
-                if int(x[2]) >= minute:
-                    shuttle_list += [x]
-                    break
+            shuttle_list += [shuttle[0]]
         else:
             handaeap = 1
         cur.execute(sql,(str(hour),'예술인A행'))
@@ -75,18 +69,19 @@ def shuttle(where):
             cur.execute(sql,(str(int(hour)+1),'예술인A행'))
             shuttle = cur.fetchall()
             if shuttle != []:
-                for x in shuttle:
-                    if int(x[2]) >= minute:
-                        shuttle_list += [x]
-                        break
+                shuttle_list += [shuttle[0]]
         if shuttle_list == []:
-            cur.execute(sql,(str(int(hour)+1),'순환버스'))
+            cur.execute(sql,(str(int(hour)),'순환버스'))
             shuttle = cur.fetchall()
             if shuttle != []:
                 for x in shuttle:
                     if int(x[2]) >= minute:
                         shuttle_list += [x]
                         break
+            cur.execute(sql,(str(int(hour)+1),'순환버스'))
+            shuttle = cur.fetchall()
+            if shuttle != []:
+                shuttle_list += [shuttle[0]]
     elif where == 2:
         cur.execute(sql,(str(hour),'게스트하우스행'))
         shuttle = cur.fetchall()
@@ -99,10 +94,7 @@ def shuttle(where):
             cur.execute(sql,(str(int(hour)+1),'게스트하우스행'))
             shuttle = cur.fetchall()
             if shuttle != []:
-                for x in shuttle:
-                    if int(x[2]) >= minute:
-                        shuttle_list += [x]
-                        break
+                shuttle_list += [shuttle[0]]
         if shuttle_list == []:
             cur.execute(sql,(str(int(hour)),'순환버스'))
             shuttle = cur.fetchall()
@@ -115,21 +107,19 @@ def shuttle(where):
             cur.execute(sql,(str(int(hour)+1),'순환버스'))
             shuttle = cur.fetchall()
             if shuttle != []:
-                for x in shuttle:
-                    if int(x[2]) >= minute:
-                        shuttle_list += [x]
-                        break
+                shuttle_list += [shuttle[0]]
     elif where == 3:
         cur.execute(sql,(str(hour),'게스트하우스행'))
         shuttle = cur.fetchall()
-        shuttle_list += [shuttle[0]]
+        for x in shuttle:
+            if int(x[2]) >= minute:
+                shuttle_list += [x]
+                break
         if shuttle_list == []:
             cur.execute(sql,(str(int(hour)+1),'게스트하우스행'))
             shuttle = cur.fetchall()
-            for x in shuttle:
-                if int(x[2]) >= minute:
-                    shuttle_list += [x]
-                    break
+            if shuttle != []:
+                shuttle_list += [shuttle[0]]
         if shuttle_list == []:
             cur.execute(sql,(str(int(hour)),'순환버스'))
             shuttle = cur.fetchall()
@@ -142,10 +132,7 @@ def shuttle(where):
             cur.execute(sql,(str(int(hour)+1),'순환버스'))
             shuttle = cur.fetchall()
             if shuttle != []:
-                for x in shuttle:
-                    if int(x[2]) >= minute:
-                        shuttle_list += [x]
-                        break    
+                shuttle_list += [shuttle[0]]
     return shuttle_list
 def ext_phone_rest():
     conn = sqlite3.connect('/home/jil8885/chatbot/crawler/phone.db')
@@ -184,7 +171,7 @@ def keyboard(request):
     return JsonResponse(
         {
             'type':'buttons',
-            'buttons':['밥','교통','전화번호 검색','카페/술집추천','도서관 열람실 조회','날씨','학사일정']
+            'buttons':['밥','교통','전화번호 검색','카페/술집추천','날씨','학사일정']
         }
     )
 @csrf_exempt
@@ -223,14 +210,6 @@ def message(request):
                 "keyboard":{'type':'buttons','buttons':['교내','교외','처음으로']}
             }
         )
-    elif content == "도서관 열람실 조회":
-        string = "아직 개발중입니다"
-        return JsonResponse(
-            {
-                "message":{"text":string},
-                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','날씨','학사일정']}
-            }
-        )
     elif content == "처음으로":
         query = "UPDATE user SET phone_search = 0 where userkey = ?"
         cur.execute(query,(userkey,))
@@ -243,7 +222,7 @@ def message(request):
         return JsonResponse(
             {
                 "message":{"text":"처음으로 돌아갑니다."},
-                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','카페/술집추천','도서관 열람실 조회','날씨','학사일정']}
+                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','카페/술집추천','날씨','학사일정']}
             }
         )
     elif content == "학생식당":
@@ -255,7 +234,7 @@ def message(request):
             return JsonResponse(
                 {
                     "message":{"text":string},
-                    "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','도서관 열람실 조회','날씨','학사일정']}
+                    "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','날씨','학사일정']}
                 }
             )
         sql = "select * from student where day=?"
@@ -274,7 +253,7 @@ def message(request):
         return JsonResponse(
             {
                 "message":{"text":string},
-                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','도서관 열람실 조회','날씨','학사일정']}
+                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','날씨','학사일정']}
             }
         )
     elif content == '교직원식당':
@@ -286,7 +265,7 @@ def message(request):
             return JsonResponse(
                 {
                     "message":{"text":string},
-                    "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','도서관 열람실 조회','날씨','학사일정']}
+                    "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','날씨','학사일정']}
                 }
             )
         sql = "select * from teacher where day=?"
@@ -308,7 +287,7 @@ def message(request):
         return JsonResponse(
             {
                 "message":{"text":string},
-                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','도서관 열람실 조회','날씨','학사일정']}
+                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','날씨','학사일정']}
             }
         )
     elif content == '푸드코트':
@@ -320,7 +299,7 @@ def message(request):
             return JsonResponse(
                 {
                     "message":{"text":string},
-                    "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','도서관 열람실 조회','날씨','학사일정']}
+                    "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','날씨','학사일정']}
                 }
             )
         sql = "select * from foodcourt where day=?"
@@ -336,16 +315,41 @@ def message(request):
         return JsonResponse(
             {
                 "message":{"text":string},
-                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','도서관 열람실 조회','날씨','학사일정']}
+                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','날씨','학사일정']}
             }
         )
     elif content == '기숙사식당':
         day = time.localtime().tm_wday
-        string = "기식은 먹는거 아닙니다."
+        conn2 = sqlite3.connect('/home/jil8885/chatbot/crawler/food.db')
+        cur2 = conn2.cursor()
+        sql = "select * from dorm where day=?"
+        cur2.execute(sql , (day,))
+        result = cur2.fetchall()
+        string =""
+        if result == []:
+            string += "오늘은 식사를 제공하지 않습니다."
+        else:
+            for x in range(0,len(result)):
+                if len(result) == 3:
+                    if x == 0:
+                        string += "===조식===\n"
+                    elif x == 1:
+                        string += "===중식===\n"
+                    elif x == 2:
+                        string += "===석식===\n"
+                elif len(result) == 8:
+                    if x == 0:
+                        string += "===조식===\n"
+                    elif x == 2:
+                        string += "===중식===\n"
+                    elif x == 5:
+                        string += "===석식===\n"
+                food_list = result[x][1]
+                string += result[x][1]+'\n\n'
         return JsonResponse(
             {
                 "message":{"text":string},
-                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','도서관 열람실 조회','날씨','학사일정']}
+                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','날씨','학사일정']}
             }
         )
     elif content == '창업보육센터':
@@ -355,7 +359,7 @@ def message(request):
         sql = "select * from changbo where day=?"
         cur2.execute(sql , (day,))
         result = cur2.fetchall()
-        string ="창업보육센터\n"
+        string =""
         for x in range(0,len(result)):
             if x == 2:
                 string += "===석식===\n"
@@ -372,7 +376,7 @@ def message(request):
         return JsonResponse(
             {
                 "message":{"text":string},
-                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','도서관 열람실 조회','날씨','학사일정']}
+                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','날씨','학사일정']}
             }
         )
     elif content == "외식" or content == "다른 식당":
@@ -389,9 +393,8 @@ def message(request):
         sql = "select * from weather"
         cur2.execute(sql)
         result = cur2.fetchall()
-        print(result)
         string = "에리카 캠퍼스 날씨\n"
-        string += result[0][0]+'시 기준\n'
+        string += result[0][0]+'시 기준\n온도 : '
         if result[0][1][0] == "-":
             string += "영하 "
             string += str(round(float(result[0][1][1:])))+'도\n'
@@ -406,7 +409,7 @@ def message(request):
         result = cur2.fetchall()
         if hour > 12:
             string += "에리카 캠퍼스 내일 날씨\n"
-            string += result[0][0]+'시 기준\n'
+            string += result[0][0]+'시 기준\n온도 : '
             if result[0][1][0] == "-":
                 string += "영하 "
                 string += str(round(float(result[0][1][1:])))+'도\n'
@@ -427,7 +430,7 @@ def message(request):
         return JsonResponse(
             {
                 "message":{"text":string},
-                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','도서관 열람실 조회','날씨','학사일정']}
+                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','날씨','학사일정']}
             }
         )
     elif content == "전화번호 검색":
@@ -494,10 +497,7 @@ def message(request):
         if search_down == []:
             cur2.execute(sql,(str(hour+1),))
             subway = cur2.fetchall()
-            for x in subway:
-                if int(x[2]) > int(minute):
-                    search_down += x
-                    break      
+            search_down += subway[0]
         if day > 4:
             sql = "select * from weekend_seoul where hour = ?"
         else:
@@ -511,10 +511,7 @@ def message(request):
         if search_down == []:
             cur2.execute(sql,(str(hour+1),))
             subway = cur2.fetchall()
-            for x in subway:
-                if int(x[2]) > int(minute):
-                    search_down += x
-                    break
+            search_down += subway[0]
         string += "한대앞역 전철 정보\n"
         if search_up == []:
             string += "서울방면 막차가 출발했습니다."
@@ -527,7 +524,7 @@ def message(request):
         return JsonResponse(
             {
                 "message":{"text":string},
-                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','카페/술집추천','도서관 열람실 조회','날씨','학사일정']}
+                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','카페/술집추천','날씨','학사일정']}
             }
         )
 
@@ -557,12 +554,13 @@ def message(request):
         return JsonResponse(
             {
                 "message":{"text":string},
-                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','카페/술집추천','도서관 열람실 조회','날씨','학사일정']}
+                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','카페/술집추천','날씨','학사일정']}
             }
         )
     elif content == "예술인A":
         string = ""
         shuttle_list = shuttle(3)
+        print(shuttle_list)
         if shuttle_list == []:
             string = "1시간 내에 도착 예정인 셔틀이 없습니다."
         else:
@@ -573,7 +571,7 @@ def message(request):
         return JsonResponse(
             {
                 "message":{"text":string},
-                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','카페/술집추천','도서관 열람실 조회','날씨','학사일정']}
+                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','카페/술집추천','날씨','학사일정']}
             }
         )
     elif content == "게스트하우스":
@@ -610,7 +608,7 @@ def message(request):
         return JsonResponse(
             {
                 "message":{"text":string},
-                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','카페/술집추천','도서관 열람실 조회','날씨','학사일정']}
+                "keyboard":{'type':'buttons','buttons':['밥','교통','전화번호 검색','카페/술집추천','날씨','학사일정']}
             }
         )
     elif content == "성안고사거리":
@@ -884,7 +882,7 @@ def message(request):
             }
         )
     elif content == "학사일정":
-        string = "이번달/ 다음달 중 선택헤주세요"
+        string = "이번달/ 다음달 중 선택해주세요"
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -931,7 +929,6 @@ def message(request):
         query = "SELECT * FROM user where userkey = ?"
         cur.execute(query,(userkey,))
         all_rows = cur.fetchall()
-        print(all_rows[0][1])
         if all_rows[0][1] == '1': 
             subject = content
             conn2 = sqlite3.connect('/home/jil8885/chatbot/crawler/phone.db')
@@ -969,8 +966,7 @@ def message(request):
                     "keyboard":{'type':'buttons','buttons':['처음으로']}
                 }
             )
-        elif all_rows[0][1] == '2': 
-            print(1)     
+        elif all_rows[0][1] == '2':      
             subject = content
             conn2 = sqlite3.connect('/home/jil8885/chatbot/crawler/phone.db')
             cur2 = conn2.cursor()

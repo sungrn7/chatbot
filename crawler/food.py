@@ -135,9 +135,53 @@ def food_crawl_changbo():
                 conn.commit()
                 day+=1
     conn.close()
+def food_crawl_dorm():
+    import datetime
+    date = datetime.datetime.now()
+    month = date.month
+    day = date.day
+    conn = sqlite3.connect('/home/jil8885/chatbot/crawler/food.db')
+    cur = conn.cursor()
+    sql = "delete from dorm"
+    cur.execute(sql)
+    req = requests.get('http://www.hanyang.ac.kr/web/www/-256')
+    source = req.text
+    soup = BeautifulSoup(source, 'html.parser')
+    week_list = soup.select('table > tbody > tr > td > ul > li')
+    index = 0
+    week_day = 0
+    conn.commit()
+    sql = "insert into dorm (day,menu) values (?,?)"
+    if week_list != []:
+        if (month == 3 and day > 2) or (month > 3 and month < 6) or (month == 6 and day < 22) or (month > 8 and month < 12) or (month == 12 and day < 22):
+            while index < len(week_list):
+                day_plus = [2,4,6,8,9,10,14,17,20,23,25,26,29,31,33,35,36,37]
+                day_zero = [11,27,38]
+                if index in day_plus:
+                    week_day += 1
+                elif index in day_zero:
+                    week_day = 0
+                cur.execute(sql,(week_day,week_list[index].text))
+            conn.commit()
+        else:
+            if len(week_list) == 18:
+                for x in week_list[:6]:
+                    cur.execute(sql,(week_day,x.text))
+                    week_day += 1
+                week_day = 0
+                for x in week_list[6:12]:
+                    cur.execute(sql,(week_day,x.text))
+                    week_day += 1
+                week_day = 0
+                for x in week_list[12:18]:
+                    cur.execute(sql,(week_day,x.text))
+                    week_day += 1
+            conn.commit()
+    conn.close()
 def main():
     food_crawl_teacher()
     food_crawl_student()
     food_crawl_foodcourt()
     food_crawl_changbo()
+    food_crawl_dorm()
 main()
