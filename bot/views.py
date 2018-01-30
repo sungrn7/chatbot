@@ -495,7 +495,7 @@ def message(request):
                 search_down += x
                 break
         if search_down == []:
-            cur2.execute(sql,(str(hour+1),))
+            cur2.execute(sql,(str(int(hour)+1),))
             subway = cur2.fetchall()
             search_down += subway[0]
         if day > 4:
@@ -509,7 +509,7 @@ def message(request):
                 search_up += x
                 break
         if search_down == []:
-            cur2.execute(sql,(str(hour+1),))
+            cur2.execute(sql,(str(int(hour)+1),))
             subway = cur2.fetchall()
             search_down += subway[0]
         string += "한대앞역 전철 정보\n"
