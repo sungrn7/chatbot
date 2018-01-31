@@ -81,7 +81,7 @@ def shuttle(where):
                 shuttle = cur.fetchall()
                 if shuttle != []:
                     shuttle_list += [shuttle[0]]
-
+        print(shuttle_list)
         
 
     elif where == 2:
