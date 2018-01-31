@@ -13,6 +13,5 @@ def subway():
 
 def main():
     weather()
-    time.sleep(60)
 
 subway()

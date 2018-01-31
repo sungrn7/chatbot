@@ -44,44 +44,46 @@ def shuttle(where):
             if shuttle != []:
                 shuttle_list += [shuttle[0]]
     elif where == 1:
-        handaeap = 0
         cur.execute(sql,(str(hour),'한대앞역행'))
         shuttle = cur.fetchall()
         if shuttle != []:
             for x in shuttle:
-                if int(x[2]) >= minute:
+                if int(x[2]) > int(minute):
                     shuttle_list += [x]
                     break
-        if shuttle_list == []:
+        else:
             cur.execute(sql,(str(int(hour)+1),'한대앞역행'))
             shuttle = cur.fetchall()
-            shuttle_list += [shuttle[0]]
-        else:
-            handaeap = 1
+            if shuttle != []:
+                shuttle_list += [shuttle[0]]           
         cur.execute(sql,(str(hour),'예술인A행'))
         shuttle = cur.fetchall()
         if shuttle != []:
             for x in shuttle:
-                if int(x[2]) >= minute:
+                if int(x[2]) > int(minute):
                     shuttle_list += [x]
                     break
-        if handaeap == 0:
+        else:
             cur.execute(sql,(str(int(hour)+1),'예술인A행'))
             shuttle = cur.fetchall()
             if shuttle != []:
                 shuttle_list += [shuttle[0]]
         if shuttle_list == []:
-            cur.execute(sql,(str(int(hour)),'순환버스'))
+            cur.execute(sql,(str(hour),'순환버스'))
             shuttle = cur.fetchall()
             if shuttle != []:
                 for x in shuttle:
-                    if int(x[2]) >= minute:
+                    if int(x[2]) > int(minute):
                         shuttle_list += [x]
                         break
-            cur.execute(sql,(str(int(hour)+1),'순환버스'))
-            shuttle = cur.fetchall()
-            if shuttle != []:
-                shuttle_list += [shuttle[0]]
+            else:
+                cur.execute(sql,(str(int(hour)+1),'순환버스'))
+                shuttle = cur.fetchall()
+                if shuttle != []:
+                    shuttle_list += [shuttle[0]]
+
+        
+
     elif where == 2:
         cur.execute(sql,(str(hour),'게스트하우스행'))
         shuttle = cur.fetchall()
@@ -476,7 +478,7 @@ def message(request):
         string = ""
         shuttle_list = shuttle(2)
         if shuttle_list == []:
-            string = "1시간 내에 도착 예정인 셔틀이 없습니다.\n\n"
+            string = "도착 예정인 셔틀이 없습니다\n\n"
         else:
             string += "한대앞역 셔틀 정보\n"
             for x in shuttle_list:
@@ -495,6 +497,8 @@ def message(request):
                 search_down += x
                 break
         if search_down == []:
+            if int(hour) == 23:
+                hour = "-1"
             cur2.execute(sql,(str(int(hour)+1),))
             subway = cur2.fetchall()
             search_down += subway[0]
@@ -508,17 +512,19 @@ def message(request):
             if int(x[2]) > int(minute):
                 search_up += x
                 break
-        if search_down == []:
+        if search_up == []:
+            if int(hour) == 23:
+                hour = "-1"
             cur2.execute(sql,(str(int(hour)+1),))
             subway = cur2.fetchall()
-            search_down += subway[0]
+            search_up += subway[0]
         string += "한대앞역 전철 정보\n"
         if search_up == []:
-            string += "서울방면 막차가 출발했습니다."
+            string += "서울방면 막차가 출발했습니다.\n"
         else:
             string += search_up[0]+"행 "+search_up[1]+"시 "+search_up[2]+"분 도착\n"
-        if search_up == []:
-            string += "오이도방면 막차가 출발했습니다."
+        if search_down == []:
+            string += "오이도방면 막차가 출발했습니다.\n"
         else:
             string += search_down[0]+"행 "+search_down[1]+"시 "+search_down[2]+"분 도착"
         return JsonResponse(
@@ -537,7 +543,7 @@ def message(request):
         string = ""
         shuttle_list = shuttle(0)
         if shuttle_list == []:
-            string = "1시간 내에 도착 예정인 셔틀이 없습니다.\n\n"
+            string = "도착 예정인 셔틀이 없습니다\n\n"
         else:
             string += "기숙사 셔틀 정보\n"
             for x in shuttle_list:
@@ -562,7 +568,7 @@ def message(request):
         shuttle_list = shuttle(3)
         print(shuttle_list)
         if shuttle_list == []:
-            string = "1시간 내에 도착 예정인 셔틀이 없습니다."
+            string = "도착 예정인 셔틀이 없습니다"
         else:
             string += "예술인아파트 셔틀 정보\n"
             for x in shuttle_list:
@@ -583,7 +589,7 @@ def message(request):
         string = ""
         shuttle_list = shuttle(1)
         if shuttle_list == []:
-            string = "1시간 내에 도착 예정인 셔틀이 없습니다.\n\n"
+            string = "도착 예정인 셔틀이 없습니다\n\n"
         else:
             string += "셔틀콕 셔틀 정보\n"
             for x in shuttle_list:
