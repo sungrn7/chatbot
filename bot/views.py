@@ -55,7 +55,7 @@ def shuttle(where):
                 if int(x[2]) >= minute:
                     handaeap += [x]
                     break
-        else:
+        elif shuttle == [] or len(handaeap) == 0:
             cur.execute(sql,(str(int(hour)+1),'한대앞역행'))
             shuttle = cur.fetchall()
             if shuttle != []:
@@ -67,7 +67,7 @@ def shuttle(where):
                 if int(x[2]) >= minute:
                     terminal += [x]
                     break
-        else:
+        elif shuttle == [] or len(terminal) == 0:
             cur.execute(sql,(str(int(hour)+1),'예술인A행'))
             shuttle = cur.fetchall()
             if shuttle != []:
@@ -79,7 +79,7 @@ def shuttle(where):
                 if int(x[2]) >= minute:
                     circle += [x]
                     break
-        else:
+        elif shuttle == [] or len(circle) == 0:
             cur.execute(sql,(str(int(hour)+1),'순환버스'))
             shuttle = cur.fetchall()
             if shuttle != []:
