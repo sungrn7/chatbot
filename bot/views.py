@@ -462,7 +462,7 @@ def message(request):
                 string += str(round(float(result[1][1])))+'도\n'
             string += "날씨 : "+result[1][2]+'\n'
             string += "안산풍 속도 : "+str(round(float(result[1][4]),1))+'m/s\n\n'
-        string += dust()
+        dust = dust()
         print(string)
         conn.close()
         conn2.close()        
