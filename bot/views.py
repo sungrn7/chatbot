@@ -13,10 +13,12 @@ def dust():
     weather = soup.find('item')
     grade1 = grade[int(weather.find('pm10Grade').string)]
     grade2 = grade[int(weather.find('pm25Grade').string)]
-    string = "미세먼지 등급 : "
-    string += grade1 + '\n'
-    string += "초미세먼지 등급 : "
-    string += grade2 + '\n'
+    string = ""
+    if int(weather.find('pm10Grade').string) > 2:
+        string += "\n\n미세먼지 등급 : "
+        string += grade1 + '\n'
+        string += "초미세먼지 등급 : "
+        string += grade2 + '\n'
     return string
 dust()
 def shuttle(where):
