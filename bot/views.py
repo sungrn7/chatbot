@@ -463,6 +463,7 @@ def message(request):
             string += "날씨 : "+result[1][2]+'\n'
             string += "안산풍 속도 : "+str(round(float(result[1][4]),1))+'m/s\n\n'
         string += dust()
+        print(dust)
         conn.close()
         conn2.close()        
         return JsonResponse(
