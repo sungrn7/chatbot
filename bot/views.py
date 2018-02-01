@@ -4,6 +4,8 @@ import json
 import sqlite3
 import random
 import time
+import requests
+from bs4 import BeautifulSoup
 def dust():
     grade = ['좋음','보통','나쁨','매우 나쁨']
     response = requests.get('http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?serviceKey=US2a7bn1A3XMUfP%2FR0BRT22upj74Dt2SdSx4rs%2BAuICHKq39N9yqCBwzqik1FsjnjHxg9xAt1yQtBlEcxIgR9A%3D%3D&numOfRows=10&pageSize=10&pageNo=1&startPage=1&stationName=%ED%98%B8%EC%88%98%EB%8F%99&dataTerm=DAILY&ver=1.3')
@@ -15,8 +17,8 @@ def dust():
     string += grade1 + '\n'
     string += "초미세먼지 등급 : "
     string += grade2 + '\n'
-    print(string)
     return string
+dust()
 def shuttle(where):
     shuttle_list = []
     import datetime
@@ -462,6 +464,7 @@ def message(request):
                 string += str(round(float(result[1][1])))+'도\n'
             string += "날씨 : "+result[1][2]+'\n'
             string += "안산풍 속도 : "+str(round(float(result[1][4]),1))+'m/s\n\n'
+        string += dust()
         conn.close()
         conn2.close()        
         return JsonResponse(
