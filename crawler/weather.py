@@ -23,5 +23,4 @@ def weather():
 
 def main():
     weather()
-    time.sleep(38400)
 main()
