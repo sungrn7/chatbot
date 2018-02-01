@@ -84,6 +84,9 @@ def shuttle(where):
             shuttle = cur.fetchall()
             if shuttle != []:
                 circle += [shuttle[0]]
+        print(handaeap)
+        print(terminal)
+        print(circle)
         shuttle_list = handaeap + terminal + circle
                                
     elif where == 2:
