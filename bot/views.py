@@ -15,6 +15,7 @@ def dust():
     string += grade1 + '\n'
     string += "초미세먼지 등급 : "
     string += grade2 + '\n'
+    print(string)
     return string
 def shuttle(where):
     shuttle_list = []
