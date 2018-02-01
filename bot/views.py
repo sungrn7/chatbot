@@ -83,10 +83,7 @@ def shuttle(where):
             cur.execute(sql,(str(int(hour)+1),'순환버스'))
             shuttle = cur.fetchall()
             if shuttle != []:
-                circle += [shuttle[0]]
-        print(handaeap)
-        print(terminal)
-        print(circle)
+                circle += [shuttle[0]]   
         shuttle_list = handaeap + terminal + circle
                                
     elif where == 2:
@@ -1096,3 +1093,11 @@ def message(request):
                     "keyboard":{'type':'buttons','buttons':['처음으로']}
                 }
             )
+        else:
+            conn.close()
+            return JsonResponse(
+                {
+                    "message":{"text":'상담원과의 상담은 버튼을 위의 상담 버튼을 누르고 해주세요'},
+                    "keyboard":{'type':'buttons','buttons':['처음으로']}
+                }
+            )            
