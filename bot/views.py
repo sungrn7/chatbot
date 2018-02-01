@@ -44,46 +44,48 @@ def shuttle(where):
             if shuttle != []:
                 shuttle_list += [shuttle[0]]
     elif where == 1:
+        handaeap = []
+        terminal = []
+        circle = []
+        sql = "select * from "+table_name+" where hour = ? and dest = ?"
         cur.execute(sql,(str(hour),'한대앞역행'))
         shuttle = cur.fetchall()
         if shuttle != []:
             for x in shuttle:
-                if int(x[2]) > int(minute):
-                    shuttle_list += [x]
+                if int(x[2]) >= minute:
+                    handaeap += [x]
                     break
         else:
             cur.execute(sql,(str(int(hour)+1),'한대앞역행'))
             shuttle = cur.fetchall()
             if shuttle != []:
-                shuttle_list += [shuttle[0]]           
+                handaeap += [shuttle[0]]
         cur.execute(sql,(str(hour),'예술인A행'))
         shuttle = cur.fetchall()
         if shuttle != []:
             for x in shuttle:
-                if int(x[2]) > int(minute):
-                    shuttle_list += [x]
+                if int(x[2]) >= minute:
+                    terminal += [x]
                     break
         else:
             cur.execute(sql,(str(int(hour)+1),'예술인A행'))
             shuttle = cur.fetchall()
             if shuttle != []:
-                shuttle_list += [shuttle[0]]
-        if shuttle_list == []:
-            cur.execute(sql,(str(hour),'순환버스'))
+                terminal += [shuttle[0]]
+        cur.execute(sql,(str(hour),'순환버스'))
+        shuttle = cur.fetchall()
+        if shuttle != []:
+            for x in shuttle:
+                if int(x[2]) >= minute:
+                    circle += [x]
+                    break
+        else:
+            cur.execute(sql,(str(int(hour)+1),'순환버스'))
             shuttle = cur.fetchall()
             if shuttle != []:
-                for x in shuttle:
-                    if int(x[2]) > int(minute):
-                        shuttle_list += [x]
-                        break
-            else:
-                cur.execute(sql,(str(int(hour)+1),'순환버스'))
-                shuttle = cur.fetchall()
-                if shuttle != []:
-                    shuttle_list += [shuttle[0]]
-        print(shuttle_list)
-        
-
+                circle += [shuttle[0]]
+        shuttle_list = handaeap + terminal + circle
+                               
     elif where == 2:
         cur.execute(sql,(str(hour),'게스트하우스행'))
         shuttle = cur.fetchall()
@@ -135,6 +137,7 @@ def shuttle(where):
             shuttle = cur.fetchall()
             if shuttle != []:
                 shuttle_list += [shuttle[0]]
+    conn.close()
     return shuttle_list
 def ext_phone_rest():
     conn = sqlite3.connect('/home/jil8885/chatbot/crawler/phone.db')
@@ -145,6 +148,7 @@ def ext_phone_rest():
     length = len(phones)
     x = random.randrange(0,length)
     string = phones[x][0]+"\n"+phones[x][1]
+    conn.close()
     return string
 
 def ext_phone_cafe():
@@ -156,6 +160,7 @@ def ext_phone_cafe():
     length = len(phones)
     x = random.randrange(0,length)
     string = phones[x][0]+"\n"+phones[x][1]
+    conn.close()
     return string
 
 def ext_phone_pub():
@@ -167,6 +172,7 @@ def ext_phone_pub():
     length = len(phones)
     x = random.randrange(0,length)
     string = phones[x][0]+"\n"+phones[x][1]
+    conn.close()
     return string
 
 def keyboard(request):
@@ -192,6 +198,7 @@ def message(request):
         cur.execute(sql,(userkey,0,0,0,))
         conn.commit()
     if content == "밥":
+        conn.close()
         return JsonResponse(
             {
                 "message":{"text":"밥먹을 곳을 선택해주세요."},
@@ -199,6 +206,7 @@ def message(request):
             }
         )
     elif content == "교통":
+        conn.close()
         return JsonResponse(
             {
                 "message":{"text":"현재위치를 골라주세요."},
@@ -206,6 +214,7 @@ def message(request):
             }
         )
     elif content == "전화번호 검색":
+        conn.close()
         return JsonResponse(
             {
                 "message":{"text":"어디번호를 찾으시나요?"},
@@ -252,6 +261,8 @@ def message(request):
                     string += food_list[x]
                     if x != len(food_list) - 1:
                         string += '\n'
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -286,6 +297,8 @@ def message(request):
                         string += '\n'
                 if x != len(result) - 1:
                     string += "\n\n"
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -314,6 +327,8 @@ def message(request):
             for x in range(0,len(result)):
                 food_list = result[x][1]
                 string += result[x][1]+'\n\n'
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -348,6 +363,8 @@ def message(request):
                         string += "===석식===\n"
                 food_list = result[x][1]
                 string += result[x][1]+'\n\n'
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -375,6 +392,8 @@ def message(request):
                     string += '\n'
             if x != len(result) - 1:
                 string += "\n\n"
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -383,6 +402,7 @@ def message(request):
         )
     elif content == "외식" or content == "다른 식당":
         string = ext_phone_rest()
+        conn.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -429,6 +449,8 @@ def message(request):
                 string += str(round(float(result[1][1])))+'도\n'
             string += "날씨 : "+result[1][2]+'\n'
             string += "안산풍 속도 : "+str(round(float(result[1][4]),1))+'m/s'
+        conn.close()
+        conn2.close()        
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -437,6 +459,7 @@ def message(request):
         )
     elif content == "전화번호 검색":
         string = "교내 검색인가요? 교외 검색인가요?"
+        conn.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -527,6 +550,8 @@ def message(request):
             string += "오이도방면 막차가 출발했습니다.\n"
         else:
             string += search_down[0]+"행 "+search_down[1]+"시 "+search_down[2]+"분 도착"
+        conn.close()
+        conn2.close()        
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -557,6 +582,8 @@ def message(request):
             string+="3102번(강남역)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
         if string == "":
             string+="도착정보가 없습니다."
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -574,6 +601,7 @@ def message(request):
             for x in shuttle_list:
                 string += x[0]+"\n"
                 string += x[1]+"시 "+x[2]+"분 도착"
+        conn.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -611,6 +639,8 @@ def message(request):
             string+="3102번(강남역)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
         if string == "":
             string+="도착정보가 없습니다."
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -618,6 +648,7 @@ def message(request):
             }
         )
     elif content == "성안고사거리":
+        conn.close()
         string = "행선지를 선택해주세요"
         return JsonResponse(
             {
@@ -648,6 +679,8 @@ def message(request):
             string+="3102번(강남역)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
         if string == "":
             string+="도착정보가 없습니다."
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -677,6 +710,8 @@ def message(request):
             string+="909번(수원역)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
         if string == "":
             string+="도착정보가 없습니다."
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -694,6 +729,8 @@ def message(request):
             string+="8467번(성남터미널)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
         if string == "":
             string+="도착정보가 없습니다."
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -715,6 +752,8 @@ def message(request):
             string+="3100번(군포/강남역)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
         if string == "":
             string+="도착정보가 없습니다."
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -732,6 +771,8 @@ def message(request):
             string+="3101번(의왕/강남역)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
         if string == "":
             string+="도착정보가 없습니다."
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -745,6 +786,8 @@ def message(request):
         cur2.execute(sql,('216000141','241006320'))
         bus = cur2.fetchall()
         string = ""
+        conn.close()
+        conn2.close()
         if len(bus) != 0:
             string+="737번(부평역)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
         if string == "":
@@ -786,6 +829,8 @@ def message(request):
             string+="99번(오이도)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
         if string == "":
             string+="도착정보가 없습니다."
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -815,6 +860,8 @@ def message(request):
             string+="99번(반월동)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
         if string == "":
             string+="도착정보가 없습니다."
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -840,6 +887,8 @@ def message(request):
             string+="99번(반월동)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
         if string == "":
             string+="도착정보가 없습니다."
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -857,6 +906,8 @@ def message(request):
             string+="31번(안산동)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
         if string == "":
             string += "도착정보가 없습니다."
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -865,6 +916,7 @@ def message(request):
         )
     elif content == "카페/술집추천":
         string = "카페나 술집 중 어느 쪽을 추천드릴까요?"
+        conn.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -873,6 +925,7 @@ def message(request):
         )
     elif content == "카페" or content == "다른 카페":
         string = ext_phone_cafe()
+        conn.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -881,6 +934,7 @@ def message(request):
         )
     elif content == "술집" or content == "다른 술집":
         string = ext_phone_pub()
+        conn.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -889,6 +943,7 @@ def message(request):
         )
     elif content == "학사일정":
         string = "이번달/ 다음달 중 선택해주세요"
+        conn.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -907,6 +962,8 @@ def message(request):
         for x in work:
             string += x[1]+"\n"
             string += x[2]+"\n\n"
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -925,6 +982,8 @@ def message(request):
         for x in work:
             string += x[1]+"\n"
             string += x[2]+"\n\n"
+        conn.close()
+        conn2.close()
         return JsonResponse(
             {
                 "message":{"text":string},
@@ -962,10 +1021,10 @@ def message(request):
                     for x in total_phone:
                         for y in x:
                             string += y+'\n'
-                conn2.close()
             else:
                 string = "경영학부는 과사 번호가 없습니다"
-                conn2.close()
+            conn.close()
+            conn2.close()
             return JsonResponse(
                 {
                     "message":{"text":string},
@@ -1026,6 +1085,7 @@ def message(request):
                 for x in total_phone:
                     for y in x:
                         string += y+'\n'
+            conn.close()
             conn2.close()
             return JsonResponse(
                 {
