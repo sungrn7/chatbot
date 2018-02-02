@@ -14,11 +14,10 @@ def dust():
     grade1 = grade[int(weather.find('pm10Grade').string)-1]
     grade2 = grade[int(weather.find('pm25Grade').string)-1]
     string = ""
-    if int(weather.find('pm10Grade').string) > 2:
-        string += "\n\n미세먼지 등급 : "
-        string += grade1 + '\n'
-        string += "초미세먼지 등급 : "
-        string += grade2 + '\n'
+    string += "\n\n미세먼지 등급 : "
+    string += grade1 + '\n'
+    string += "초미세먼지 등급 : "
+    string += grade2 + '\n'
     return string
 
 def shuttle(where):
@@ -586,18 +585,18 @@ def message(request):
         string = ""
         shuttle_list = shuttle(0)
         if shuttle_list == []:
-            string = "도착 예정인 셔틀이 없습니다\n\n"
+            string = "도착 예정인 셔틀이 없습니다"
         else:
             string += "기숙사 셔틀 정보\n"
             for x in shuttle_list:
                 string += x[0]+"\n"
                 string += x[1]+"시 "+x[2]+"분 도착\n\n"
         if len(bus) != 0:
-            string+="10번(상록수역)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
+            string+="\n10번(상록수역)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착"
         cur2.execute(sql,('216000383','216000061'))
         bus = cur2.fetchall()
         if len(bus) != 0:
-            string+="3102번(강남역)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
+            string+="\n3102번(강남역)\n"+bus[0][2]+"전 정거장\n"+bus[0][6]+"분 후 도착\n"
         if string == "":
             string+="도착정보가 없습니다."
         conn.close()
