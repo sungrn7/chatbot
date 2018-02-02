@@ -10,7 +10,7 @@ def wherebus(stn):
     cur = conn.cursor()
     sql = "delete from bus where stnid = ?"
     cur.execute(sql,(stn,))
-    conn.commit ()
+    conn.commit()
     for bus in soup.findAll('busArrivalList'):
         location1 = bus.find('locationNo1').string
         plate1 = bus.find('plateNo1').string
